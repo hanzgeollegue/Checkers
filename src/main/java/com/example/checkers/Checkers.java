@@ -1,7 +1,10 @@
 package com.example.checkers;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 import javafx.scene.canvas.Canvas;
@@ -12,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.StageStyle;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -58,7 +62,7 @@ public class Checkers extends Application {
         /* Create the label that will show messages. */
 
         message = new Label("Click \"New Game\" to begin.");
-        message.setTextFill( Color.rgb(100,255,100) ); // Light green.
+        message.setTextFill( Color.WHITE); // Light green.
         message.setFont( Font.font(null, FontWeight.BOLD, 18) );
 
         /* Create the buttons and the board.  The buttons MUST be
@@ -78,40 +82,47 @@ public class Checkers extends Application {
         resignButton.setOnAction( e -> board.doResign() );
         board.setOnMousePressed( e -> board.mousePressed(e) );
 
-        /* Set the location of each child by calling its relocate() method */
-
-        board.relocate(140,130);
-        newGameButton.relocate(170, 90);
-        resignButton.relocate(340, 90);
-        message.relocate(130, 500);
-
         /* Set the sizes of the buttons.  For this to have an effect, make
          * the butons "unmanaged."  If they are managed, the Pane will set
          * their sizes. */
 
-        resignButton.setManaged(false);
         resignButton.resize(100,30);
-        newGameButton.setManaged(false);
         newGameButton.resize(100,30);
 
         /* Create the Pane and give it a preferred size.  If the
          * preferred size were not set, the unmanaged buttons would
          * not be included in the Pane's computed preferred size. */
 
-        Pane root = new Pane();
 
+        Label title = new Label("HANZ CHECKER");
+        title.setTextFill(Color.WHITE); // Light green.
+        title.setFont(Font.font(null, FontWeight.BOLD, 25) );
+        HBox titleContainer = new HBox(title);
+        HBox headerContainer = new HBox(newGameButton, resignButton);
+        HBox boardContainer = new HBox(board);
+
+        titleContainer.setAlignment(Pos.CENTER);
+        headerContainer.setAlignment(Pos.CENTER);
+        boardContainer.setAlignment(Pos.CENTER);
+
+        headerContainer.setSpacing(10);
+
+        VBox root = new VBox();
+
+        root.setSpacing(20);
+        root.setAlignment(Pos.CENTER);
         root.setPrefWidth(600);
         root.setPrefHeight(600);
 
         /* Add the child nodes to the Pane and set up the rest of the GUI */
+        root.getChildren().addAll(titleContainer, headerContainer, boardContainer);
 
-        root.getChildren().addAll(board, newGameButton, resignButton, message);
-        root.setStyle("-fx-background-color: darkgreen; "
-                + "-fx-border-color: darkred; -fx-border-width:3");
+        root.setStyle("-fx-background-color: c1b49d;");
         Scene scene = new Scene(root);
+        stage.initStyle(StageStyle.DECORATED);
         stage.setScene(scene);
-        stage.setResizable(false);
-        stage.setTitle("Dama ni Hanz KEKWKWKWKWK");
+        stage.setResizable(true);
+        stage.setTitle("HANZCHECKER");
         stage.show();
 
     } // end start()
@@ -195,16 +206,14 @@ public class Checkers extends Application {
          * is set up in the start() method in the main class.
          */
         void doNewGame() {
-            if (gameInProgress == true) {
+            if (gameInProgress) {
                 // This should not be possible, but it doesn't hurt to check.
-                message.setText("Finish the current game first!");
                 return;
             }
             board.setUpGame();   // Set up the pieces.
             currentPlayer = CheckersData.RED;   // RED moves first.
             legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
             selectedRow = -1;   // RED has not yet selected a piece to move.
-            message.setText("Red:  Make your move.");
             gameInProgress = true;
             newGameButton.setDisable(true);
             resignButton.setDisable(false);
@@ -217,8 +226,7 @@ public class Checkers extends Application {
          * set up in the start() method in the main class.
          */
         void doResign() {
-            if (gameInProgress == false) {  // Should be impossible.
-                message.setText("There is no game in progress!");
+            if (!gameInProgress) {  // Should be impossible.
                 return;
             }
             if (currentPlayer == CheckersData.RED)
@@ -256,10 +264,10 @@ public class Checkers extends Application {
                 if (legalMoves[i].fromRow == row && legalMoves[i].fromCol == col) {
                     selectedRow = row;
                     selectedCol = col;
-                    if (currentPlayer == CheckersData.RED)
-                        message.setText("RED:  Make your move.");
+                    if (currentPlayer == CheckersData.RED) {
+
+                    }
                     else
-                        message.setText("BLACK:  Make your move.");
                     drawBoard();
                     return;
                 }
@@ -268,7 +276,6 @@ public class Checkers extends Application {
              select a piece.  Show an error message and return. */
 
             if (selectedRow < 0) {
-                message.setText("Click the piece you want to move.");
                 return;
             }
 
@@ -286,7 +293,6 @@ public class Checkers extends Application {
              the user just clicked is not one where that piece can be legally moved.
              Show an error message. */
 
-            message.setText("Click the square you want to move to.");
 
         }  // end doClickSquare()
 
@@ -308,10 +314,12 @@ public class Checkers extends Application {
             if (move.isJump()) {
                 legalMoves = board.getLegalJumpsFrom(currentPlayer,move.toRow,move.toCol);
                 if (legalMoves != null) {
-                    if (currentPlayer == CheckersData.RED)
-                        message.setText("RED:  You must continue jumping.");
-                    else
-                        message.setText("BLACK:  You must continue jumping.");
+                    if (currentPlayer == CheckersData.RED) {
+
+                    }
+                    else {
+
+                    }
                     selectedRow = move.toRow;  // Since only one piece can be moved, select it.
                     selectedCol = move.toCol;
                     drawBoard();
@@ -326,22 +334,28 @@ public class Checkers extends Application {
             if (currentPlayer == CheckersData.RED) {
                 currentPlayer = CheckersData.BLACK;
                 legalMoves = board.getLegalMoves(currentPlayer);
-                if (legalMoves == null)
-                    gameOver("BLACK has no moves.  RED wins.");
-                else if (legalMoves[0].isJump())
-                    message.setText("BLACK:  Make your move.  You must jump.");
-                else
-                    message.setText("BLACK:  Make your move.");
+                if (legalMoves == null) {
+
+                }
+                else if (legalMoves[0].isJump()) {
+
+                }
+                else {
+
+                }
             }
             else {
                 currentPlayer = CheckersData.RED;
                 legalMoves = board.getLegalMoves(currentPlayer);
-                if (legalMoves == null)
-                    gameOver("RED has no moves.  BLACK wins.");
-                else if (legalMoves[0].isJump())
-                    message.setText("RED:  Make your move.  You must jump.");
-                else
-                    message.setText("RED:  Make your move.");
+                if (legalMoves == null) {
+
+                }
+                else if (legalMoves[0].isJump()) {
+
+                }
+                else {
+
+                }
             }
 
             /* Set selectedRow = -1 to record that the player has not yet selected
@@ -384,7 +398,7 @@ public class Checkers extends Application {
 
             /* Draw a two-pixel black border around the edges of the canvas. */
 
-            g.setStroke(Color.DARKRED);
+            g.setStroke(Color.WHITE);
             g.setLineWidth(2);
             g.strokeRect(1, 1, 322, 322);
 
@@ -393,7 +407,7 @@ public class Checkers extends Application {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
                     if ( row % 2 == col % 2 )
-                        g.setFill(Color.LIGHTGRAY);
+                        g.setFill(Color.rgb(232, 214, 187));
                     else
                         g.setFill(Color.GRAY);
                     g.fillRect(2 + col*40, 2 + row*40, 40, 40);
@@ -457,8 +471,9 @@ public class Checkers extends Application {
          * clicked and call doClickSquare() to handle it.
          */
         public void mousePressed(MouseEvent evt) {
-            if (gameInProgress == false)
-                message.setText("Click \"New Game\" to start a new game.");
+            if (!gameInProgress) {
+
+            }
             else {
                 int col = (int)((evt.getX() - 2) / 40);
                 int row = (int)((evt.getY() - 2) / 40);
@@ -700,16 +715,14 @@ public class Checkers extends Application {
             if (player == RED) {
                 if (board[r1][c1] == RED && r3 > r1)
                     return false;  // Regular red piece can only move up.
-                if (board[r2][c2] != BLACK && board[r2][c2] != BLACK_KING)
-                    return false;  // There is no black piece to jump.
-                return true;  // The jump is legal.
+                return board[r2][c2] == BLACK || board[r2][c2] == BLACK_KING;  // There is no black piece to jump.
+// The jump is legal.
             }
             else {
                 if (board[r1][c1] == BLACK && r3 < r1)
                     return false;  // Regular black piece can only move downn.
-                if (board[r2][c2] != RED && board[r2][c2] != RED_KING)
-                    return false;  // There is no red piece to jump.
-                return true;  // The jump is legal.
+                return board[r2][c2] == RED || board[r2][c2] == RED_KING;  // There is no red piece to jump.
+// The jump is legal.
             }
 
         }  // end canJump()
@@ -729,14 +742,12 @@ public class Checkers extends Application {
                 return false;  // (r2,c2) already contains a piece.
 
             if (player == RED) {
-                if (board[r1][c1] == RED && r2 > r1)
-                    return false;  // Regular red piece can only move down.
-                return true;  // The move is legal.
+                return board[r1][c1] != RED || r2 <= r1;  // Regular red piece can only move down.
+// The move is legal.
             }
             else {
-                if (board[r1][c1] == BLACK && r2 < r1)
-                    return false;  // Regular black piece can only move up.
-                return true;  // The move is legal.
+                return board[r1][c1] != BLACK || r2 >= r1;  // Regular black piece can only move up.
+// The move is legal.
             }
 
         }  // end canMove()
