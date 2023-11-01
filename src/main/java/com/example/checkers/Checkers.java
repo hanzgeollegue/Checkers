@@ -104,11 +104,8 @@ public class Checkers extends Application {
         titleContainer.setAlignment(Pos.CENTER);
         headerContainer.setAlignment(Pos.CENTER);
         boardContainer.setAlignment(Pos.CENTER);
-
         headerContainer.setSpacing(10);
-
         VBox root = new VBox();
-
         root.setSpacing(20);
         root.setAlignment(Pos.CENTER);
         root.setPrefWidth(600);
